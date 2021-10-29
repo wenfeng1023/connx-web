@@ -8,30 +8,38 @@
      <script src="{% static 'js/dropzone.min.js'%}" type="text/javascript"></script>
      <script src="{% static 'js/jquery-3.3.1.min.js'%}"></script>
      <link rel="stylesheet" href="{% static 'css/dropzone.min.css'%}">
+     <link rel ='stylesheet' href="{% static 'css/style.css'%}">
      <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
      <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+     .container {
+     
+     position: absolute;
+     left: 50%;
+     top: 30%;
+     transform: translate(-50%, -90%);
+     border: 5px;
+     padding: 10px;
+     .dz-max-files-reached {background-color: red};
+     }
+     .dropzone .dz-preview .dz-error-message {
+     top: 150px!important;
+     }
+</style>
 </head>
-
+ 
 <body>
 
-
-     <!-- <form action="{% url 'view' %}" method="post" enctype="multipart/form-data" class="dropzone"
-               id="your_form_id">
-               {% csrf_token %}
-               <button type="submit" formmethod="POST" formaction="{%url 'index'%}">
-                    Transfer to PNG
-               </button>
-          </form>
-          <button type="button" id="btn_upload">Upload</button>
-     -->
-
+<!--
           <form method="post" enctype="multipart/form-data" name="form2">
                {% csrf_token %}
                {{ form.as_p }}
                <input type="submit" value="submit">
           </form>
-   
-     <div class="container" id="previews">
+   -->
+
+     <div class="container" id="previews" >
           <div class='content'>
                <form action="{% url 'index' %}" method="POST" id="my-dropzone" enctype="multipart/form-data"
                     class="dropzone" name="form2">
@@ -44,40 +52,43 @@
                <i class="glyphicon glyphicon-upload"></i>
                <span>Convert to Connx</span>
           </button>
-          <!--<button type="button" class="btn btn-warning cancel">
-               <i class="glyphicon glyphicon-ban-circle"></i>
-               <span><a href="{%url 'download'%}">Download PNG</a></span>
-          </button>-->
-          <!--<button><a href="{%url 'download'%}">Download PNG</a></button>-->
      </div>
      <script>
           Dropzone.autoDiscover = false;
 
           var myDropzone = new Dropzone(".dropzone", {
                addRemoveLinks: true,
+               dictDefaultMessage: "Drop or click your onnx file here to upload",
+               acceptedFiles: ".onnx",
                autoProcessQueue: false,
+               maxFiles: 1,
                parallelUploads: 10, // Number of files process at a time (default 2)
+               maxfilesexceeded: function(file) {
+                    this.removeAllFiles();
+                    this.addFile(file);
+               },
+
                init: function () {
+
                     this.on("success", function (file, responseText) {
                          var filename = file.name;
                          $('#form').append("<input type='hidden' data='" + filename + "' name='files[]' value='" + responseText + "'>");
                     });
-                    this.on("complete", function (file) {
-                         var newNode = document.createElement('a');
-                         newNode.className = 'btn btn-primary btn-xs downloadbtn';
-                         newNode.href = "{%url 'download'%}";
-                         newNode.target = "_blank";
-                         newNode.innerHTML = '<i class="fa fa-download"></i> Download';
-                         file.previewTemplate.appendChild(newNode);
+                   
+
+                    this.on("success", function(file,response){
+                         $('button[id="uploadfiles"]').replaceWith(
+                              '<button type="button" class="btn"><i class="fa fa-download"></i><span><a href="{%url 'download'%}">Download Connx Model</a></span></button>'
+                         );
                     });
                }
           });
           // myDropzone is the configuration for the element that has an id attribute
           // with the value my-dropzone or myDropzone
-
           $('#uploadfiles').click(function () {
                myDropzone.processQueue();
           });
+
      </script>
 </body>
 </html>
