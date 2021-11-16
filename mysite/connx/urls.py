@@ -7,6 +7,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('view/', png_viewer, name='view'),
     path('download/', download_view, name='download')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

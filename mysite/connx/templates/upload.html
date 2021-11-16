@@ -46,8 +46,7 @@
                     {% csrf_token %}
                </form>
           </div>
-
-          <!-- <input type="button" id='uploadfiles' value='Upload Files'>-->
+          
           <button type="button" id='uploadfiles' class="btn btn-primary start">
                <i class="glyphicon glyphicon-upload"></i>
                <span>Convert to Connx</span>
@@ -67,7 +66,6 @@
                     this.removeAllFiles();
                     this.addFile(file);
                },
-
                init: function () {
 
                     this.on("success", function (file, responseText) {

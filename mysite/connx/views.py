@@ -6,6 +6,9 @@ import os
 import subprocess
 from django.utils.http import urlquote
 from django.views.decorators.csrf import csrf_protect,csrf_exempt
+import shutil
+
+
 
 # Create your views here.
 @csrf_exempt
@@ -22,13 +25,10 @@ def index(request):
     if request.method == 'POST':
         form = FileForm(request.POST, request.FILES)
         if form.is_valid():
-            #Covert the file to PNG
+            #Get Files
             files = request.FILES.getlist('file')
             file_name = files[0].name.split('.')
-            print(file_name)
-            # data = get_data(files[0])
-            # rect1, rect2, rect3, ax1, ax2, ax3 = draw_barth(data)
-            # save_pitcure(rect1, rect2, rect3, ax1, ax2, ax3, data, file_name)
+            
             # request.session['file_name'] = file_name
             
 
@@ -45,48 +45,36 @@ def index(request):
                 for chunk in file.chunks():
                     destination.write(chunk)
                 destination.close()
-            path = "python -m onnx_connx "+ "upload/"+file_name[0] +".onnx "
-            print(path)
-            out = subprocess.run(path, shell=True, check= True,capture_output=True,text=True)
-            return redirect('view')
+
+            #Using the Onnx_Connx Molde to get Connx File
+            if not os.path.exists("./out"):
+                path = "python -m onnx_connx "+ "./upload/"+file_name[0] +".onnx "
+                subprocess.run(path, shell=True, check= True,capture_output=True,text=True)
+
+                # Compressed Files 
+                shutil.make_archive("out",'zip', "out")
+            else:
+                shutil.rmtree("./out")
+                path = "python -m onnx_connx "+ "./upload/"+file_name[0] +".onnx"
+                subprocess.run(path, shell=True, check= True,capture_output=True,text=True)
+
+                # Compressed Files 
+                shutil.make_archive("out",'zip', "out")         
+
+            return redirect('download')
     else:
         form = FileForm()
         return render(request, 'upload.html', locals())
 
-def png_viewer(request):
-    #file_name = request.session['file_name']
-    
-    file_name= "model.connx"
-    
-    return render(request, 'file_list.html', {'file_name': file_name})
-
+"""
+Download the Connx Model
+"""
 def download_view(request):
     #file_name = request.session['file_name']
-    """
-    Download the Connx Model
-    """
-    #file_result = FileModel.objects.filter(id=id)
-    '''
-    if file_result:
-
-        file = list(file_result)[0]
-
-        # 文件名称及路径
-        name = file.name
-        path = file.path
-
-        # 读取文件
-        file = open(path, 'rb')
-        response = FileResponse(file)
-
-        # 使用urlquote对文件名称进行编码
-        response[
-            'Content-Disposition'] = 'attachment;filename="%s"' % urlquote(
-                name)
-    '''
-    name = "model.connx"  #file.name
-    path = "out/model.connx"  #file.path
+    name = "out.zip"  #file.name
+    path = "./out.zip"  #file.path
     File_exists = os.path.exists(path)
+
     if File_exists == True:
 
         # Read the File
